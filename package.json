@@ -5,7 +5,10 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "babel-node index.js — out-file index-compiled.js",
+    "clean": "rm -rf build && mkdir build",
+    "build-babel": "npx babel --out-dir build",
+    "build": "npm run clean && npm run build-babel",
+    "start": "npm run build && node ./build/index.js",
     "dev": "nodemon index.js --exec babel-node"
   },
   "author": "",
@@ -22,6 +25,7 @@
   },
   "devDependencies": {
     "@babel/core": "^7.14.8",
-    "@babel/node": "^7.14.7"
+    "@babel/node": "^7.14.7",
+    "babel-cli": "^6.26.0"
   }
 }
