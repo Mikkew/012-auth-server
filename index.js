@@ -25,9 +25,13 @@ app.use( cors() );
 // Lectura y paseo del body
 app.use( express.json() )
 
-
 // Rutas
 app.use( '/api/v1/auth', auth );
+
+//Manejar demas rutas
+app.get('*', (req, res) => {
+  res.sendFile( path.resolve( __dirname, 'public/index.html' ) );
+});
 
 
 app.listen( ENV.PORT, () => {
