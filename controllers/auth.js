@@ -38,6 +38,7 @@ export const crearUsuario = async(req =  request, res = response ) => {
   return res.status( 201 ).json({
     ok: true,
     uid: dbUser.id,
+    email,
     name,
     username,
     lastName,
@@ -77,11 +78,18 @@ export const loginUsuario = async (req =  request, res = response ) => {
       });
     }
 
-    const token = await generarJWT( dbUser._id, dbUser.username, dbUser.name );
+    const token = await generarJWT( 
+      dbUser._id, 
+      dbUser.username, 
+      dbUser.name, 
+      dbUser.lastName, 
+      dbUser.email 
+    );
 
     return res.json({
       ok: true,
-      uid: dbUser.uid,
+      uid: dbUser._id,
+      email: dbUser.email,
       name: dbUser.name,
       lastName: dbUser.lastName,
       token
@@ -99,15 +107,17 @@ export const loginUsuario = async (req =  request, res = response ) => {
 
 export const revalidarToken = async (req = request, res = response) => {
 
-  const { username, uid, name } =  req;
+  const { username, uid, name, lastName, email } =  req;
 
-  const token = await generarJWT( uid, username, name );
+  const token = await generarJWT( uid, username, name, lastName, email);
 
   return res.json({
     ok: true,
-    username, 
     uid, 
+    email,
+    username, 
     name,
+    lastName, 
     token
   });
 
