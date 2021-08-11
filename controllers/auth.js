@@ -3,87 +3,80 @@ import Usuario from "../models/Usuario";
 import bcrypt from "bcryptjs";
 import generarJWT from "../utils/jwt";
 
-
-export const crearUsuario = async(req =  request, res = response ) => {
-
+export const crearUsuario = async (req = request, res = response) => {
   const { email, username, password, name, lastName } = req.body;
 
   try {
+    // Verificar el correo que no exista
 
-  // Verificar el correo que no exista
+    const usuario = await Usuario.findOne({ email: email });
 
-  const usuario = await Usuario.findOne({ email: email});
+    if (usuario) {
+      return res.status(400).json({
+        ok: false,
+        msg: "El email ya existe",
+      });
+    }
 
-  if( usuario ) {
-    return res.status( 400 ).json({
-      ok: false,
-      msg: "El email ya existe"
+    // Crear Usuario con el modelo
+    const dbUser = new Usuario(req.body);
+
+    // Encriptar la contraseña
+    const salt = bcrypt.genSaltSync();
+    dbUser.password = bcrypt.hashSync(password, salt);
+
+    // General el JWT
+    const token = await generarJWT(dbUser.uid, username);
+
+    // Crear Usuario de BD
+    await dbUser.save();
+
+    //Generar Respuesta Exitosa
+    return res.status(201).json({
+      ok: true,
+      uid: dbUser.id,
+      email,
+      name,
+      username,
+      lastName,
+      token,
     });
-  }
-
-  // Crear Usuario con el modelo
-  const dbUser = new Usuario( req.body )
-
-  // Encriptar la contraseña
-  const salt = bcrypt.genSaltSync();
-  dbUser.password = bcrypt.hashSync( password, salt );
-
-  // General el JWT
-  const token = await generarJWT( dbUser.uid, username );
-
-  // Crear Usuario de BD
-  await dbUser.save();
-
-  //Generar Respuesta Exitosa
-  return res.status( 201 ).json({
-    ok: true,
-    uid: dbUser.id,
-    email,
-    name,
-    username,
-    lastName,
-    token
-  });
-    
   } catch (error) {
-    return res.status( 500 ).json({
+    return res.status(500).json({
       ok: false,
-      msg: "Error en el servidor"
+      msg: "Error en el servidor",
     });
   }
+};
 
-}
-
-
-export const loginUsuario = async (req =  request, res = response ) => {
-  
+export const loginUsuario = async (req = request, res = response) => {
   const { email, password } = req.body;
 
   try {
     const dbUser = await Usuario.findOne({ email });
 
-    if( !dbUser ) {
-      return res.status( 400 ).json({
+    if (!dbUser) {
+      return res.status(400).json({
         ok: false,
-        msg: "El correo no existe"
+        msg: "El correo no existe",
       });
     }
 
-    const validPassword = bcrypt.compareSync( password, dbUser.password );
+    const validPassword = bcrypt.compareSync(password, dbUser.password);
 
-    if( !validPassword ) {
-      return res.status( 400 ).json({
+    if (!validPassword) {
+      return res.status(400).json({
         ok: false,
-        msg: "Contraseña Incorrecta"
+        msg: "Contraseña Incorrecta",
       });
     }
 
-    const token = await generarJWT( 
-      dbUser._id, 
-      dbUser.username, 
-      dbUser.name, 
-      dbUser.lastName, 
-      dbUser.email 
+    const token = await generarJWT(
+      dbUser._id,
+      dbUser.username,
+      dbUser.name,
+      dbUser.lastName,
+      dbUser.email
     );
 
     return res.json({
@@ -92,33 +85,28 @@ export const loginUsuario = async (req =  request, res = response ) => {
       email: dbUser.email,
       name: dbUser.name,
       lastName: dbUser.lastName,
-      token
-    })
-    
+      token,
+    });
   } catch (error) {
-    return res.status( 500 ).json({
+    return res.status(500).json({
       ok: false,
-      msg: "Error en el servidor"
+      msg: "Error en el servidor",
     });
   }
-
-}
-
+};
 
 export const revalidarToken = async (req = request, res = response) => {
+  const { username, uid, name, lastName, email } = req;
 
-  const { username, uid, name, lastName, email } =  req;
-
-  const token = await generarJWT( uid, username, name, lastName, email);
+  const token = await generarJWT(uid, username, name, lastName, email);
 
   return res.json({
     ok: true,
-    uid, 
+    uid,
     email,
-    username, 
+    username,
     name,
-    lastName, 
-    token
+    lastName,
+    token,
   });
-
-}
+};

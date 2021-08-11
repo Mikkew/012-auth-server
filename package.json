@@ -6,7 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "clean": "rm -rf build && mkdir build",
-    "build-babel": "npx babel --out-dir build",
+    "build-babel": "babel -d ./build ./ -s",
     "build": "npm run clean && npm run build-babel",
     "start": "npm run build && node ./build/index.js",
     "dev": "nodemon index.js --exec babel-node"
@@ -14,7 +14,6 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@babel/preset-env": "^7.14.7",
     "bcryptjs": "^2.4.3",
     "cors": "^2.8.5",
     "dotenv": "^10.0.0",
@@ -24,8 +23,9 @@
     "mongoose": "^5.13.3"
   },
   "devDependencies": {
+    "@babel/cli": "^7.14.8",
     "@babel/core": "^7.14.8",
     "@babel/node": "^7.14.7",
-    "babel-cli": "^6.26.0"
+    "@babel/preset-env": "^7.15.0"
   }
 }

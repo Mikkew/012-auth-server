@@ -4,7 +4,7 @@ import { crearUsuario, loginUsuario, revalidarToken } from '../controllers/auth'
 import { validarCampos } from '../middlewares/validar-campos';
 import validarJWT from '../middlewares/validar-jwt';
 
-export const router = Router();
+const router = Router();
 
 
 //Creacion de Usuarios
@@ -51,10 +51,12 @@ router.post(
   ],
   loginUsuario);
 
-
-//Validar o Revalidar Token
-router.get(
-  "/renew",
-  validarJWT,
-  revalidarToken, 
-  );
+  
+  //Validar o Revalidar Token
+  router.get(
+    "/renew",
+    validarJWT,
+    revalidarToken, 
+    );
+    
+export {router as auth};
