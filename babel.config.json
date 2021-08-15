@@ -1,0 +1,16 @@
+{
+  "presets": [
+    [
+      "@babel/preset-env",
+      {
+        "targets": {
+          "node": true,
+          "useBuiltIns": "entry"
+        }
+      }
+    ]
+  ],
+  "plugins": [
+    "@babel/plugin-transform-typescript"
+  ]
+}
